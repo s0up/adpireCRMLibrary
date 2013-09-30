@@ -1,12 +1,26 @@
 <?php
 class AdpireCRM{
-    private $api_token;
-    private $api_version = 'v1';
-    private $api_url = 'http://adpirecrm.com/api';
     private $store = array();
     
-    function __construct(){
+    function __construct($apiUrl = null, $apiToken = null){
         $this->setBillingSameAsShipping(true);
+        $this->setAPIVersion('v1');
+        
+        if(!is_null($apiUrl)){
+            $this->setAPIUrl($apiUrl);
+        }
+        
+        if(!is_null($apiToken)){
+            $this->setAPIToken($apiToken);
+        }
+    }
+    
+    public function setCustomerId($customerId){
+        $this->set('customerId', $customerId);
+    }
+    
+    public function getCustomerId(){
+        return $this->get('customerId');
     }
     
     public function setAPIToken($apiToken){
@@ -33,6 +47,38 @@ class AdpireCRM{
         return $this->get('apiUrl');
     }
     
+    public function setPID($pid){
+        $this->set('pid', $pid);
+    }
+    
+    public function getPID(){
+        return $this->get('pid');
+    }
+    
+    public function setSource($source){
+        $this->set('source', $source);
+    }
+    
+    public function getSource(){
+        return $this->get('source');
+    }
+    
+    public function setAffCode($affCode){
+        $this->set('affCode', $affCode);
+    }
+    
+    public function getAffCode(){
+        return $this->get('affCode');
+    }
+    
+    public function setAffSub($affSub){
+        $this->set('affSub', $affSub);
+    }
+
+    public function getAffSub(){
+        return $this->get('affSub');
+    }
+    
     public function setFirstName($firstName){
         $this->set('firstName', $firstName);
     }
@@ -47,6 +93,22 @@ class AdpireCRM{
     
     public function getLastName(){
         return $this->get('lastName');
+    }
+    
+    public function setPhone($phone){
+        $this->set('phone', $phone);
+    }
+    
+    public function getPhone(){
+        return $this->get('phone');
+    }
+    
+    public function setEmail($email){
+        $this->set('email', $email);
+    }
+    
+    public function getEmail(){
+        return $this->get('email');
     }
     
     public function setAddress($address){
@@ -141,6 +203,10 @@ class AdpireCRM{
         $this->set('billingAddress', $billingAddress);
     }
     
+    public function getBillingAddress(){
+        return $this->get('billingAddress');
+    }
+    
     public function setBillingCity($city){
         $this->set('billingCity', $city);
     }
@@ -176,6 +242,60 @@ class AdpireCRM{
     public function getAll(){
         return $this->store;
     }
+    
+    public function sale($options = array()){
+        $data = array();
+        
+        $data['api_token'] = $this->getAPIToken();
+        $data['version'] = $this->getAPIVersion();
+        $data['action'] = 'sale';
+        $data['first_name'] = $this->getFirstName();
+        $data['last_name'] = $this->getLastName();
+        $data['address'] = $this->getAddress();
+        $data['address2'] = $this->getAddress2();
+        
+        if($this->getCustomerId()){
+            $data['customer_id'] = $this->getCustomerId();
+        }
+        
+        if($this->getBillingSameAsShipping()){
+            $data['billing_same_as_shipping'] = $this->getBillingSameAsShipping();
+        } else{
+            $data['billing_first_name'] = $this->getBillingFirstName();
+            $data['billing_last_name'] = $this->getBillingLastName();
+            $data['billing_address'] = $this->getBillingAddress();
+            $data['billing_city'] = $this->getBillingCity();
+            $data['billing_state'] = $this->getBillingState();
+            $data['billing_zip'] = $this->getBillingZip();
+        }
+        
+        $data['city'] = $this->getCity();
+        $data['state'] = $this->getState();
+        $data['zip'] = $this->getZip();
+        $data['affcode'] = $this->getAffCode();
+        $data['affsub'] = $this->getAffSub();
+        $data['source'] = $this->getSource();
+        $data['phone'] = $this->getPhone();
+        $data['email'] = $this->getEmail();
+        $data['cvv'] = $this->getCVV();
+        $data['ccno'] = $this->getCCNo();
+        $data['ccexp'] = $this->getCCExp();
+        $data['pid'] = $this->getPID();
+        
+        if(!empty($options) && count($options) > 0){
+            $options = implode("|", $options);
+            $data['package_option'] = $options;
+        }
+        
+        $r = $this->post($data);
+        
+        if(!empty($r->customer_id)){
+            $this->setCustomerId(strval($r->customer_id));
+        }
+        
+        return $r;
+    }
+    
     
     private function post($api_data){
         $api_url = $this->getAPIUrl();
