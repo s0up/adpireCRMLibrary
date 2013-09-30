@@ -1,0 +1,44 @@
+AdpireCRM PHP Library
+
+Sale Syntax:
+
+$crm = new AdpireCRM("http://your_api_url", "your_api_token");
+
+$crm->setFirstName("mike");
+$crm->setLastName("c");
+$crm->setCCNo("4111111111111111");
+$crm->setCCExp("1016");
+$crm->setCVV("123");
+$crm->setAddress("1234 test st");
+$crm->setAddress2("Suite 201");
+$crm->setCity("Chino");
+$crm->setState("CA");
+$crm->setZip("90210");
+
+$crm->setBillingSameAsShipping(true);
+
+if(!$crm->setBillingSameAsShipping){
+	$crm->setBillingAddress("1234 test st");
+	$crm->setBillingFirstName("john");
+	$crm->setBillingLastName("doe");
+	$crm->setBillingCity("city");
+	$crm->setBillingState("CA");
+	$crm->setBillingZip("90210");
+}
+
+//Package SKU from CRM backend
+$crm->setPID("SOMESKU");
+
+//Tracking vars
+$crm->setSource("SOME_SOURCE");
+$crm->setAffCode("SOME_AFFCODE");
+$crm->setAffSub("SOME_AFFSUB");
+
+//Optional package options
+$options = array('FREE_SHIPPING', 'TEN_DOLLARS_OFF');
+
+$result = $crm->sale($options);
+
+
+
+
